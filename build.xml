@@ -1,0 +1,57 @@
+<?xml version="1.0"?>
+<project name="weather" basedir="." default="compile">
+
+	<property name="root.dir" location="${basedir}" />
+	<property name="src.dir" location="${root.dir}/src" />
+	<property name="build.dir" location="${root.dir}/build" />
+	<property name="lib.dir" location="${root.dir}/lib" />
+	<property name="resources.dir" location="${root.dir}/resources" />
+	
+	<path id="javac.classpath">
+		<fileset dir="${lib.dir}">
+			<include name="log4j*.jar"/>
+			<include name="mysql-connector-java*.jar"/>
+			<!-- # RXTX.jar package needs to be in /jre/lib/ext (or /Library/Java/Extensions) -->
+			<!-- <include name="derby*.jar"/> # no longer using derby -->
+			<!-- <include name="${lib.dir}/comm*.jar" /> # sun's comm package wouldn't work with rxtx -->
+		</fileset>
+	</path>
+	
+	<path id="java.classpath">
+		<pathelement path="${build.dir}" />
+		<path refid="javac.classpath" />
+		<pathelement path="${resources.dir}" />
+	</path>
+
+	<target name="init">
+		<mkdir dir="${build.dir}" />
+	</target>
+	
+	<target name="clean">
+		<delete dir="${build.dir}" />
+	</target>
+
+	<target name="compile" depends="init">
+		<javac srcdir="${src.dir}" destdir="${build.dir}" classpathref="javac.classpath" includes="**/*.java" debug="true">
+			<compilerarg value="-Xlint:unchecked"/>
+		</javac>
+	</target>
+	
+	<target name="run" depends="compile">
+		<java dir="${build.dir}" classname="edu.washington.apl.weather.WMR968" classpathref="java.classpath" fork="true" />
+	</target>
+	
+	<!-- mostly derby stuff 
+	<target name="sql-setup" depends="compile">
+		<java dir="${build.dir}" classname="edu.washington.apl.weather.db.SQLSetup" classpathref="java.classpath" fork="true" >
+			<jvmarg value="-Dderby.system.home=${root.dir}/data" />
+		</java>
+	</target>
+
+	<target name="sql-summary" depends="compile">
+		<java dir="${build.dir}" classname="edu.washington.apl.weather.db.SQLSummary" classpathref="java.classpath" fork="true" >
+			<jvmarg value="-Dderby.system.home=${root.dir}/data" />
+		</java>
+	</target>
+	-->
+</project>

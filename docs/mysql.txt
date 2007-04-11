@@ -1,0 +1,51 @@
+MYSQL INFO:
+-----------
+
+port: 3306
+root: root / 1q2w3e4r
+user: weather / WMR968
+database: weather
+tables: rain, temperature, wind
+note: to get remote access, must set bind-address to static ip in my.cnf
+note: bug in mysql administrator user admin, must set DEBUG_DONT_SPAWN_FETCHES=1 
+note: to set inital root password, start mysql with root user, and exec:
+
+SET PASSWORD FOR 'root'@'localhost' = PASSWORD('yourpassword');
+
+DATABASE SCHEMA:
+----------------
+
+CREATE DATABASE  `weather`.`weather`; /*!40100 DEFAULT CHARACTER SET latin1 */
+
+CREATE TABLE  `weather`.`rain` (
+  `date` timestamp NOT NULL default CURRENT_TIMESTAMP,
+  `battery` int(11) NOT NULL default '0',
+  `rate` int(11) NOT NULL default '0',
+  `total` int(11) NOT NULL default '0',
+  `yesterday` int(11) NOT NULL default '0',
+  `tips` int(11) NOT NULL default '0',
+  `reset` timestamp NOT NULL default '0000-00-00 00:00:00',
+  PRIMARY KEY  (`date`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
+CREATE TABLE  `weather`.`temperature` (
+  `date` timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
+  `battery` int(11) NOT NULL default '0',
+  `sensor` int(11) NOT NULL default '0',
+  `temperature` float NOT NULL default '0',
+  `humidity` int(11) NOT NULL default '0',
+  `dew` int(11) NOT NULL default '0',
+  `pressure` int(11) NOT NULL default '0',
+  `tendency` int(11) NOT NULL default '0',
+  PRIMARY KEY  (`date`,`sensor`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
+CREATE TABLE  `weather`.`wind` (
+  `date` timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
+  `battery` int(11) NOT NULL default '0',
+  `bearing` int(11) NOT NULL default '0',
+  `gust` float NOT NULL default '0',
+  `average` float NOT NULL default '0',
+  `chill` int(11) NOT NULL default '0',
+  PRIMARY KEY  (`date`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;

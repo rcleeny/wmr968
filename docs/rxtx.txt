@@ -1,0 +1,22 @@
+Notes on RXTX:
+
+o rxtx v2.0 should be used with sun javax.comm packages and rxtx v2.1 should be used 
+with the rxtx gnu.io package, but couldn't get the former to work
+
+o javax.comm.properties should be set with 'driver=gnu.io.RXTXCommDriver'
+
+o javax.comm.properties is suppose to load in a great number of ways, but the only 
+way it would load for me is from working directory
+
+o the jni lib and RXTXComm.jar need to go in /Library/Java/Extensions, this is 
+always automatically added to your classpath (no need for java.library.path)
+
+o the rxtx software uses locks for the ports ... these are placed in 
+/var/lock (not /var/spool/uucp like it says in the docs) ... you should also be 
+added to the uucp group and chgrp of /var/lock to uucp:
+
+drwxrwxr-x     2 root    uucp      68 Oct 20 16:25 /var/lock 
+
+o on mac, groups aren't set in /etc/group but with NetInfo; easiest to use 
+/Applications/Utilities/NetInfo Manager.app but also util called niutil as well
+
