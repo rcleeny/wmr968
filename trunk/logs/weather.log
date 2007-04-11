@@ -1,1 +1,5 @@
 DEBUG [GWTWeatherServiceImpl]: {db.password=WMR968, db.database=weather, db.protocol=jdbc:mysql:, db.username=weather, db.driver=com.mysql.jdbc.Driver, db.server=10.208.79.148}
+2007-04-11 12:14:04,992 INFO  [WMR968]: Anenometer -- length [11]: FF FF 00 00 24 42 01 10 00 17 8C { battery: 0, bearing: 224, gust speed: 1.4, average speed: 1.0, wind chill: 17C }
+2007-04-11 12:14:09,707 INFO  [WMR968]: Rain -- length [16]: FF FF 01 00 00 00 11 00 00 00 07 13 24 03 07 58 { battery: 0, rate: 0mm/hr, total rain: 11mm, rain yesterday: 0mm, bucket tips: 0, reset date: 13:7, 24-3-7 }
+2007-04-11 12:14:15,391 INFO  [WMR968]: Indoor -- length [14]: FF FF 06 00 06 02 36 05 95 39 00 00 06 1B { battery: 0, inside temp: 20.6C, humidity: 36%, dew point: 5C, baro pressure: 3053mb, tendency: 3, sea level reference: 600.0, sea level pressure: 3653.0mb }
+2007-04-11 12:14:16,419 INFO  [WMR968]: Outdoor -- length [9]: FF FF 03 11 68 01 30 00 AB { battery: 1, outside temp: 16.8C, humidity: 30%, dew point: 0C }
