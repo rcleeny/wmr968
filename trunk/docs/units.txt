@@ -1,0 +1,39 @@
+UNITS:
+------
+
+Actual units next to database schema types.
+
+TABLE rain (
+  date timestamp NOT NULL default CURRENT_TIMESTAMP, -- date string
+  battery int(11) NOT NULL default 0,  -- higer value means lower battery voltage
+  rate int(11) NOT NULL default 0, -- mm per hour 
+  total int(11) NOT NULL default 0, -- mm
+  yesterday int(11) NOT NULL default 0, -- mm 
+  tips int(11) NOT NULL default 0, -- total number of tips that account for total
+  reset timestamp NOT NULL default '0000-00-00 00:00:00', -- last bucket reset (should be midnight each night)  
+  PRIMARY KEY (date)
+) 
+
+TABLE temperature (
+  date timestamp NOT NULL default CURRENT_TIMESTAMP, -- date string
+  battery int(11) NOT NULL default 0, -- higher value means lower batter voltage
+  sensor int(11) NOT NULL default 0, -- sensor type: outdoor = 3, indoor = 6   
+  temperature float NOT NULL default 0, -- celcius
+  humidity int(11) NOT NULL default 0, -- percentage
+  dew int(11) NOT NULL default 0, -- dew point, celcius
+  pressure int(11) NOT NULL default 0, -- ** barometric pressure, millibars  
+  tendency int(11) NOT NULL default 0, -- ** tendency: 12 = clear, 6 = partly cloudy, 3 = rain, 2 = cloudy  
+  PRIMARY KEY (date,sensor)
+) 
+
+** indicates indoor sensor only 
+
+TABLE wind (
+  date timestamp NOT NULL default CURRENT_TIMESTAMP, -- date string
+  battery int(11) NOT NULL default 0, -- higher value means lower battery voltage
+  bearing int(11) NOT NULL default 0, -- direction in degrees, northenly (from north to south) = 0 
+  gust float NOT NULL default 0, -- largest gust, meters per second 
+  average float NOT NULL default 0, -- average speed, meters per second 
+  chill int(11) NOT NULL default 0, -- wind chill, celcius 
+  PRIMARY KEY (date)
+) 

@@ -1,0 +1,116 @@
+<?xml version="1.0"?>
+<project name="gwtweather" basedir="." default="build">
+	<property file="build.properties"/>
+
+	<property name="root.dir" location="${basedir}" />
+	<property name="src.dir" location="${root.dir}/src" />
+ 	<property name="build.dir" location="${root.dir}/build" />
+ 	<property name="lib.dir" location="${root.dir}/lib" />
+ 	<property name="dist.dir" location="${root.dir}/dist" />
+ 	
+ 	<property name="resources.dir" location="${root.dir}/resources" />
+ 	
+ 	<!-- gwt buiild folders -->
+ 	<property name="bin.dir" location="${root.dir}/bin" />
+ 	<property name="www.dir" location="${root.dir}/www" />
+ 	<property name="tomcat.dir" location="${root.dir}/tomcat" />
+ 	
+ 	<!-- gwt properties -->
+ 	<property name="gwt.module" value="edu.washington.apl.weather.gwt.GWTWeather" />
+ 	
+ 	<path id="lib.classpath">
+ 		<fileset dir="${lib.dir}">
+			<include name="log4j*.jar"/>
+			<include name="mysql-connector-java*.jar"/>
+		</fileset>
+ 	</path>
+ 	
+ 	<path id="gwt.classpath">
+ 		<pathelement path="${src.dir}"/>
+		<pathelement path="${bin.dir}"/>
+		<fileset dir="${gwt.home}" includes="gwt-user.jar" />
+		
+		<!-- okay to have both, not needed will just be ignored -->
+		<fileset dir="${gwt.home}" includes="gwt-dev-mac.jar" /> 
+		<fileset dir="${gwt.home}" includes="gwt-dev-windows.jar" />
+	</path>
+	
+	<path id="javac.classpath">
+		<path refid="gwt.classpath" />
+		<path refid="lib.classpath" />
+	</path>
+	
+	<path id="shell.classpath">
+		<path refid="gwt.classpath" />
+		<pathelement path="${build.dir}"/> <!-- needed for servlets -->
+		<path refid="lib.classpath" />
+		<pathelement path="${resources.dir}" />
+	</path>
+	
+	<path id="compile.classpath">
+		<path refid="gwt.classpath" />
+ 	</path>
+	
+	<target name="check.env" unless="gwt.home">
+		<fail>No GWT Home (gwt.home) defined in build.properties; see build.properties.example for more info.</fail>
+  </target>
+  
+	<!-- need special jvm arg on mac, otherwise set to empty -->
+  <target name="check.args" unless="gwt.args">
+  	<property name="gwt.args" value="" />
+  </target>
+	
+	<target name="clean" description="clean all build folders (including gwt builds)">
+		<delete dir="${build.dir}"/>
+		<delete dir="${bin.dir}" quiet="true" />
+		<delete dir="${www.dir}" quiet="true" />
+		<delete dir="${tomcat.dir}" quiet="true" />
+	</target>
+	
+	<!-- needed to build the servlet portions -->
+	<target name="build" depends="check.env" description="build all code (required for servlet running in shell)">
+		<mkdir dir="${build.dir}" />
+		<javac srcdir="${src.dir}" destdir="${build.dir}" classpathref="javac.classpath" includes="**/*.java" debug="true"/>
+	</target>
+	
+	<!-- doesn't include arguments passed into shell (e.g. $@) -->
+	<!-- depends on build to compile servlet portions -->
+	<target name="shell" depends="build, check.env, check.args" description="run gwt shell">
+		<java classname="com.google.gwt.dev.GWTShell" classpathref="shell.classpath" fork="true">
+			<jvmarg value="${gwt.args}" />
+			<arg value="-out" />
+			<arg value="${www.dir}" />
+			<arg value="${gwt.module}/GWTWeather.html" />
+		</java>
+	</target>
+	
+	<!-- doesn't include arguments passed into compile (e.g. $@) -->
+	<target name="compile" depends="build, check.env, check.args">
+		<java classname="com.google.gwt.dev.GWTCompiler" classpathref="compile.classpath" fork="true">
+			<jvmarg value="${gwt.args}" />
+			<arg value="-out" />
+			<arg value="${www.dir}" />
+			<arg value="${gwt.module}" />
+		</java>
+	</target>
+	
+	<target name="war" depends="build, compile">
+		<copy file="${www.dir}/${gwt.module}/GWTWeather.html" tofile="${www.dir}/${gwt.module}/index.html" />
+		
+		<mkdir dir="${dist.dir}" />
+		<jar destfile="${dist.dir}/gwtweather.war">
+			<zipfileset dir="${resources.dir}" includes="web.xml" prefix="WEB-INF" />
+			<zipfileset dir="${build.dir}" includes="**/*" prefix="WEB-INF/classes" />
+			<zipfileset dir="${resources.dir}" prefix="WEB-INF/classes">
+				<include name="*.properties" />
+			</zipfileset>
+			<zipfileset dir="${lib.dir}" prefix="WEB-INF/lib">
+				<include name="log4j*.jar" />
+				<include name="mysql-connector-java*.jar" />
+			</zipfileset>
+			<zipfileset dir="${gwt.home}" includes="gwt-servlet.jar" prefix="WEB-INF/lib" />
+			<fileset dir="${www.dir}/${gwt.module}" includes="**/*" />
+		</jar>
+	</target>
+</project>
+

@@ -1,0 +1,3 @@
+#!/bin/sh
+APPDIR=`dirname $0`;
+java -XstartOnFirstThread -cp "$APPDIR/src:$APPDIR/bin:$APPDIR/build:/opt/java/gwt-mac-1.3.3/gwt-user.jar:/opt/java/gwt-mac-1.3.3/gwt-dev-mac.jar" com.google.gwt.dev.GWTShell -out "$APPDIR/www" "$@" edu.washington.apl.weather.gwt.GWTWeather/GWTWeather.html;

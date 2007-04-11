@@ -1,0 +1,1 @@
+All byte data is used as int because java does not have unsigned bytes.
