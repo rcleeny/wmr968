@@ -43,27 +43,7 @@ public class WMR968 implements SerialPortEventListener, Runnable {
 			logger.error("Could not find properties file: " + pfile, e);
 			return;
 		}
-		
-		try {
-			Class.forName(WeatherProperties.getDriver()).newInstance();
-		} catch (ClassNotFoundException e) {
-			logger.error("SQL Driver Not Found", e);
-			return;	
-		} catch (InstantiationException e) {
-			logger.error("Could NOt Instantiate Driver", e);
-			return;	
-		} catch (IllegalAccessException e) {
-			logger.error("Illegal Access", e);
-			return;	
-		}
-		
-	  try {
-	  	connection = DriverManager.getConnection(WeatherProperties.getConnectionString());
-	  } catch(SQLException e) {
-	  	logger.error("Could Not Make Connection To: " + WeatherProperties.getConnectionString(), e);
-	  	return;	
-	  }
-	  
+
 	  decoder = new PacketDecoder();
 	  		
 		try {
@@ -84,6 +64,28 @@ public class WMR968 implements SerialPortEventListener, Runnable {
 		} catch(Exception e) {
 			logger.error("ERROR Setting Up Ports & Streams", e);
 		}
+
+		if(!WeatherProperties.isDatabaseEnabled()) return;
+		
+		try {
+			Class.forName(WeatherProperties.getDriver()).newInstance();
+		} catch (ClassNotFoundException e) {
+			logger.error("SQL Driver Not Found", e);
+			return;	
+		} catch (InstantiationException e) {
+			logger.error("Could NOt Instantiate Driver", e);
+			return;	
+		} catch (IllegalAccessException e) {
+			logger.error("Illegal Access", e);
+			return;	
+		}
+		
+	  try {
+	  	connection = DriverManager.getConnection(WeatherProperties.getConnectionString());
+	  } catch(SQLException e) {
+	  	logger.error("Could Not Make Connection To: " + WeatherProperties.getConnectionString(), e);
+	  	return;	
+	  }
 	}
 
 	// packet buffer and length
@@ -99,6 +101,7 @@ public class WMR968 implements SerialPortEventListener, Runnable {
 
 	public void serialEvent(SerialPortEvent e) {
 		if(e.getEventType() == SerialPortEvent.DATA_AVAILABLE) {
+			Packet p = null;
 			
 			try {
 				plength = stream.read(packet);
@@ -122,13 +125,23 @@ public class WMR968 implements SerialPortEventListener, Runnable {
 				// otherwise keep buffering
 				} else return;
 	
-				Packet p = decoder.decode(buffer, length);
+				p = decoder.decode(buffer, length);
 				
 				if(p == null || p.getType() == Packet.INVALID_T) {
 					logger.debug("packet could not be created");
 					return;
 				}
+				
 				logger.info(p);
+			
+			} catch(Exception exp) {
+				logger.error("Problem With Packet", exp);
+				return;
+			}
+
+			if(!WeatherProperties.isDatabaseEnabled()) return;
+
+			try {
 
 				Statement s = connection.createStatement();
 
@@ -144,10 +157,12 @@ public class WMR968 implements SerialPortEventListener, Runnable {
 				s.close();
 
 			} catch(SQLException exp) {
-					logger.error("Problem With SQL", exp);
-			  	return;	
+				logger.error("Problem With SQL", exp);
+			  return;
+
 			} catch(Exception exp) {
-				logger.error("Problem With Packet", exp);
+				logger.error("Problem with SQL (Non-SQLException)", exp);
+			  return;	
 			}
 		}
 	}

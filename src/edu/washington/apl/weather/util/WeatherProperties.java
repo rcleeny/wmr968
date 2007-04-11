@@ -17,6 +17,8 @@ public class WeatherProperties extends Properties {
 	private static final String OUTDOOR_RATE_DEFAULT = "1";
 	private static final String RAIN_RATE_DEFAULT = "2";
 
+	private static final String DB_ENABLE_DEFAULT = "false";
+
 	private static final String DB_DRIVER_DEFAULT = "com.mysql.jdbc.Driver";	
 	private static final String DB_PROTOCOL_DEFAULT = "jdbc:mysql:";
 	private static final String DB_SERVER_DEFAULT = "endif";
@@ -32,6 +34,8 @@ public class WeatherProperties extends Properties {
 	private static double indoorRate = 0;
 	private static double outdoorRate = 0;
 	private static double rainRate = 0;
+
+	private static boolean enable = false;
 	
 	private static String driver = null;
 	private static String protocol = null;
@@ -56,6 +60,8 @@ public class WeatherProperties extends Properties {
 		indoorRate = Double.parseDouble(singleton.getProperty("indoor.rate", INDOOR_RATE_DEFAULT));
 		outdoorRate = Double.parseDouble(singleton.getProperty("outdoor.rate", OUTDOOR_RATE_DEFAULT));
 		rainRate = Double.parseDouble(singleton.getProperty("rain.rate", RAIN_RATE_DEFAULT));
+
+		enable = Boolean.parseBoolean(singleton.getProperty("db.enable", DB_ENABLE_DEFAULT));
 		
 		driver = singleton.getProperty("db.driver", DB_DRIVER_DEFAULT);
 		protocol = singleton.getProperty("db.protocol", DB_SERVER_DEFAULT);
@@ -89,11 +95,16 @@ public class WeatherProperties extends Properties {
 		return singleton.driver;
 	} 
 
-	public static Properties getInstance() {
-		return singleton;
+	public static boolean isDatabaseEnabled() {
+		return singleton.enable;
 	}
 
 	public static String getConnectionString() {
 		return singleton.protocol + "//" + singleton.server + "/" + singleton.database + "?user=" + singleton.username + "&password=" + singleton.password;
 	}
+	
+	public static Properties getInstance() {
+		return singleton;
+	}
+
 }
